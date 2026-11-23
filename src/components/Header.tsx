@@ -80,7 +80,8 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
       </div>
 
       {/* Mobile Drawer */}
-      {mobileMenuOpen && (\n        <div className="md:hidden mx-6 mt-2 rounded-[24px] bg-[#F9F8F6]/95 backdrop-blur-[24px] border border-[#1A1817]/[0.08] p-6 shadow-elevated animate-in fade-in slide-in-from-top-4 duration-300">
+      {mobileMenuOpen && (
+        <div className="md:hidden mx-6 mt-2 rounded-[24px] bg-[#F9F8F6]/95 backdrop-blur-[24px] border border-[#1A1817]/[0.08] p-6 shadow-elevated animate-in fade-in slide-in-from-top-4 duration-300">
           <nav className="flex flex-col gap-4 text-sm font-medium text-[#1A1817]">
             {siteConfig.navLinks.map((item) => (
               <a

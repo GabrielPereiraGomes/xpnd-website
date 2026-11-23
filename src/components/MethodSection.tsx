@@ -79,7 +79,8 @@ export const MethodSection: React.FC = () => {
           <div className="lg:col-span-7 flex flex-col gap-8">
             {steps.map((step, idx) => {
               const Icon = step.icon;
-              return (\n                <div
+              return (
+                <div
                   key={step.num}
                   onMouseEnter={() => setActiveStep(idx)}
                   className={`rounded-[28px] border p-8 sm:p-10 transition-all duration-500 ease-apple ${
