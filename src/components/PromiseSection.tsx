@@ -10,7 +10,7 @@ export const PromiseSection: React.FC = () => {
       <div className="mx-auto max-w-4xl">
         {/* Editorial Eyebrow Badge */}
         <div className="inline-flex items-center gap-2 rounded-full border border-[#1A1817]/[0.08] bg-[#F3EFEA] px-4 py-1.5 mb-8 text-[11px] font-semibold tracking-wider uppercase text-[#8B746B]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#8B746B]"/>
+          <span className="h-1.5 w-1.5 rounded-full bg-[#8B746B]" />
           Assessoria Privada de Inteligência Artificial para Empresas
         </div>
 

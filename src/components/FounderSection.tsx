@@ -1,5 +1,6 @@
 import React from 'react';
 import { Briefcase, Building2, TrendingUp, Sparkles } from 'lucide-react';
+import { xpndAvatarFounderUrl } from '../assets/images';
 
 export const FounderSection: React.FC = () => {
   const credentials = [
@@ -35,7 +36,7 @@ export const FounderSection: React.FC = () => {
             <div className="relative w-full max-w-sm rounded-[32px] overflow-hidden bg-[#F9F8F6] border border-[#1A1817]/[0.08] p-8 shadow-subtle text-center">
               <div className="mx-auto mb-6 h-28 w-28 rounded-full overflow-hidden bg-[#E5D4C0]/40 border-2 border-[#D4C0AC] flex items-center justify-center">
                 <img
-                  src="/logos/xpnd_avatar_v1_ajustado.png"
+                  src={xpndAvatarFounderUrl}
                   alt="Gabriel Pereira Gomes — XPND"
                   className="h-full w-full object-cover"
                 />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { siteConfig } from '../site.config';
 import { ChevronDown } from 'lucide-react';
+import { xpndPlushRetinaUrl } from '../assets/images';
 
 interface HeroStageProps {
   onAnimationComplete?: () => void;
@@ -86,7 +87,7 @@ export const HeroStage: React.FC<HeroStageProps> = ({ onAnimationComplete }) => 
           >
             <div className="relative inline-block plush-breathing">
               <img
-                src="/logos/xpnd_plush_retina.png"
+                src={xpndPlushRetinaUrl}
                 alt="XPND 3D Micro-Plush Oficial"
                 className="h-10 sm:h-14 md:h-20 lg:h-24 w-auto object-contain drop-shadow-[0_8px_16px_rgba(94,75,67,0.12)] transition-transform duration-500"
                 loading="eager"
@@ -105,13 +106,19 @@ export const HeroStage: React.FC<HeroStageProps> = ({ onAnimationComplete }) => 
 
           {/* 3. Vertical Slot with Smooth Masked Overflow */}
           <div
-            className={`relative flex items-center overflow-hidden h-[1.35em] transition-all duration-700 ease-apple ${
+            className={`relative flex items-center transition-all duration-700 ease-apple ${
+              phase === 'locked' ? 'overflow-visible h-auto py-1' : 'overflow-hidden h-[1.35em]'
+            } ${
               phase === 'enter' || phase === 'dot' ? 'opacity-0 translate-y-3' : 'opacity-100 translate-y-0'
             }`}
-            style={{
-              maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
-            }}
+            style={
+              phase === 'locked'
+                ? undefined
+                : {
+                    maskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+                    WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)',
+                  }
+            }
           >
             {phase === 'locked' ? (
               // Final Locked Word: COMPANY in Carbon Ink (#1A1817)
