@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: #F9F8F6;
+  }
+  body {
+    background-color: #F9F8F6;
+    color: #1A1817;
+    overflow-x: hidden;
+  }
+}
+
+/* Apple Easing Curves */
+.ease-apple {
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Organic Plush Breathing Animation (Micro-Movement) */
+.plush-breathing {
+  filter: url(#xpnd-fluffy-displace);
+  transform: translateZ(0);
+  will-change: transform, filter;
+  animation: plush-breathe 4s ease-in-out infinite alternate;
+}
+
+@keyframes plush-breathe {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.008) translateY(-1px);
+  }
+  100% {
+    transform: scale(0.996) translateY(0.5px);
+  }
+}
+
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .plush-breathing {
+    filter: none !important;
+    animation: none !important;
+  }
+}
