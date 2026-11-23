@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <title>XPND — Assessoria Privada de Inteligência Artificial para Empresas</title>
+    <meta name="description" content="Sua empresa não precisa de mais ferramentas. Precisa de Inteligência Artificial funcionando na rotina com segurança e sem tecniquês." />
+    <meta name="theme-color" content="#F9F8F6" />
+    
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+      /* Base resets & Apple-inspired rendering */
+      :root {
+        --color-snow: #F9F8F6;
+        --color-carbon: #1A1817;
+        --color-taupe: #8B746B;
+        --color-oak: #D4C0AC;
+      }
+      body {
+        background-color: #F9F8F6;
+        color: #1A1817;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+      ::selection {
+        background: #8B746B;
+        color: #F9F8F6;
+      }
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #F9F8F6;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #D4C0AC;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #8B746B;
+      }
+    </style>
+  </head>
+  <body class="bg-xpnd-snow text-xpnd-carbon min-h-screen selection:bg-xpnd-taupe selection:text-xpnd-snow">
+    <!-- SVG Filter Defs for Organic Micro-Plush Breathing Effect -->
+    <svg class="sr-only" aria-hidden="true" width="0" height="0">
+      <defs>
+        <filter id="xpnd-fluffy-displace" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence id="plushTurbulence" type="fractalNoise" baseFrequency="0.045 0.045" numOctaves="2" result="noise" seed="2">
+            <animate attributeName="baseFrequency" dur="7s" values="0.042 0.046;0.048 0.042;0.042 0.046" repeatCount="indefinite" />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.8" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </defs>
+    </svg>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
