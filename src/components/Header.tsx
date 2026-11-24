@@ -38,33 +38,42 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
     >
       <div
         className={`mx-auto max-w-6xl px-6 transition-all duration-500 ease-apple ${
-          scrolled ? 'pt-3 pb-3' : 'pt-5 pb-5'
+          scrolled ? 'pt-3 pb-3' : 'pt-4 pb-2'
         }`}
       >
         <div
-          className={`flex h-14 items-center justify-between rounded-full px-6 transition-all duration-500 ease-apple border ${
+          className={`flex h-14 items-center justify-between md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] rounded-full px-6 transition-all duration-500 ease-apple border ${
             scrolled
               ? 'bg-[#F9F8F6]/85 backdrop-blur-[18px] border-[#1A1817]/[0.08] shadow-[0_4px_24px_-4px_rgba(26,24,23,0.05)]'
-              : 'bg-[#F9F8F6]/60 backdrop-blur-[10px] border-transparent'
+              : 'bg-transparent border-transparent'
           }`}
         >
-          {/* Logo XPND */}
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              const lenis = getLenis();
-              if (lenis) lenis.scrollTo(0, { duration: 1.15 });
-              else window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            className="flex items-center gap-2 text-xl font-extrabold tracking-[-0.03em] text-[#1A1817] font-sans transition-colors hover:text-[#8B746B]"
-            aria-label="XPND Home"
-          >
-            <span className="font-sans font-extrabold text-2xl tracking-[-0.03em] text-[#1A1817]">XPND</span>
-          </a>
+          {/* Logo XPND Oficial Vetorial Flat */}
+          <div className="flex items-center md:justify-self-start">
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                const lenis = getLenis();
+                if (lenis) lenis.scrollTo(0, { duration: 1.15 });
+                else window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="inline-flex items-center transition-opacity duration-300 hover:opacity-75"
+              aria-label="XPND Home"
+            >
+              <img
+                src="/assets/xpnd_flat_carbon.svg"
+                alt="XPND"
+                width={3112}
+                height={1360}
+                className="h-8 sm:h-9 w-auto translate-y-[2px] -ml-[5px] select-none"
+                loading="eager"
+              />
+            </a>
+          </div>
 
-          {/* Desktop Nav Links (com Atlason animated underline) */}
-          <nav className="hidden md:flex items-center gap-8 text-[13px] font-medium text-[#1A1817]/75">
+          {/* Desktop Nav Links (Estritamente centralizados no eixo da página + Atlason underline) */}
+          <nav className="hidden md:flex md:justify-self-center items-center gap-8 text-[13px] font-medium text-[#1A1817]/75">
             {siteConfig.navLinks.map((item) => (
               <a
                 key={item.href}
@@ -73,35 +82,35 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
                   e.preventDefault();
                   handleNavClick(item.href);
                 }}
-                className="editorial-link transition-colors hover:text-[#1A1817] py-1"
+                className="editorial-link transition-colors hover:text-[#1A1817] py-1 whitespace-nowrap"
               >
                 {item.label}
               </a>
             ))}
           </nav>
 
-          {/* Desktop CTA Pill Button */}
-          <div className="hidden md:flex items-center">
+          {/* Right Column: Desktop CTA Pill Button & Mobile Menu Trigger */}
+          <div className="flex items-center justify-end md:justify-self-end">
             <a
               href="#contato"
               onClick={(e) => {
                 e.preventDefault();
                 handleNavClick('#contato');
               }}
-              className="editorial-btn-pill inline-flex h-9 items-center justify-center rounded-full bg-[#1A1817] px-4 text-xs font-semibold text-[#F9F8F6] shadow-sm hover:bg-[#8B746B]"
+              className="hidden md:inline-flex editorial-btn-pill h-9 items-center justify-center rounded-full bg-[#1A1817] px-5 text-xs font-semibold text-[#F9F8F6] shadow-sm hover:bg-[#8B746B] whitespace-nowrap"
             >
               Agendar diagnóstico
             </a>
-          </div>
 
-          {/* Mobile Menu Hamburger */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex h-9 w-9 items-center justify-center rounded-full bg-[#1A1817]/[0.05] text-[#1A1817]"
-            aria-label="Alternar menu de navegação"
-          >
-            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
+            {/* Mobile Menu Hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden flex h-9 w-9 items-center justify-center rounded-full bg-[#1A1817]/[0.05] text-[#1A1817]"
+              aria-label="Alternar menu de navegação"
+            >
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Dropdown Menu */}

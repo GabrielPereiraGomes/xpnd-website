@@ -10,9 +10,13 @@ export const Footer: React.FC = () => {
           
           {/* Brand & Mission */}
           <div className="max-w-sm">
-            <span className="font-sans font-extrabold text-2xl tracking-[-0.03em] text-[#1A1817] block mb-2">
-              XPND
-            </span>
+            <img
+              src="/assets/xpnd_flat_carbon.svg"
+              alt="XPND"
+              width={3112}
+              height={1360}
+              className="h-9 w-auto -ml-[6px] mb-1 select-none"
+            />
             <p className="text-xs text-[#1A1817]/65 leading-relaxed">
               Assessoria privada de Inteligência Artificial para empresas de 3 a 30 colaboradores. Infraestrutura real, dados protegidos e estética executiva.
             </p>
