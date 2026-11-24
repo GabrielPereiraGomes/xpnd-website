@@ -48,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
               : 'bg-transparent border-transparent'
           }`}
         >
-          {/* Logo XPND Oficial Vetorial Flat */}
+          {/* Logo XPND Fluffy Pale Oak Estática (fiel ao padrão da Hero sem loop) */}
           <div className="flex items-center md:justify-self-start">
             <a
               href="#"
@@ -58,17 +58,21 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
                 if (lenis) lenis.scrollTo(0, { duration: 1.15 });
                 else window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="inline-flex items-center transition-opacity duration-300 hover:opacity-75"
+              className="inline-flex items-center transition-opacity duration-300 hover:opacity-85"
               aria-label="XPND Home"
             >
-              <img
-                src="/assets/xpnd_flat_carbon.svg"
-                alt="XPND"
-                width={3112}
-                height={1360}
-                className="h-8 sm:h-9 w-auto translate-y-[2px] -ml-[5px] select-none"
-                loading="eager"
-              />
+              <picture className="inline-flex items-center select-none pointer-events-none">
+                <source srcSet="/assets/xpnd_logo_fluffy_pale_oak_v2_static.webp" type="image/webp" />
+                <img
+                  src="/assets/xpnd_logo_fluffy_pale_oak_v2_static.png"
+                  alt="XPND"
+                  width={374}
+                  height={134}
+                  className="h-9 sm:h-10 w-auto object-contain -ml-[4px] select-none"
+                  loading="eager"
+                  decoding="sync"
+                />
+              </picture>
             </a>
           </div>
 
