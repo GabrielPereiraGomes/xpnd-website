@@ -45,7 +45,7 @@ export const siteConfig = {
     fallbackMailto: 'lisa@xpnd.company',
   },
 
-  // Sequência de Palavras da Rotação da Abertura (v3 — 7 Etapas)
+  // Sequência de Palavras da Rotação da Abertura (v3 — 7 Etapas Ágeis)
   heroAnimation: {
     words: [
       'AI',
@@ -57,8 +57,9 @@ export const siteConfig = {
       'Company',
     ],
     finalSignature: 'Company',
-    durationPerWord: 0.85,
-    pauseBetweenWords: 0.8,
+    initialDelay: 0.25,
+    durationPerWord: 0.38,
+    pauseBetweenWords: 0.26,
   },
 
   // Navegação Principal do Header
