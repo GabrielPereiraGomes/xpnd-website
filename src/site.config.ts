@@ -45,19 +45,20 @@ export const siteConfig = {
     fallbackMailto: 'lisa@xpnd.company',
   },
 
-  // Sequência de Palavras da Rotação da Abertura
+  // Sequência de Palavras da Rotação da Abertura (v3 — 7 Etapas)
   heroAnimation: {
-    rotatingWords: [
-      'IA',
-      'IMPLEMENTAÇÃO',
-      'MARKETING',
-      'TASTE',
-      'GROWTH',
-      'AUTONOMIA'
+    words: [
+      'AI',
+      'Negócios',
+      'Automações',
+      'Agentes',
+      'Taste',
+      'Growth',
+      'Company',
     ],
-    finalSignature: 'COMPANY',
-    spinDurationPerWordMs: 420,
-    pauseBeforeFinalMs: 450,
+    finalSignature: 'Company',
+    durationPerWord: 0.85,
+    pauseBetweenWords: 0.8,
   },
 
   // Navegação Principal do Header
