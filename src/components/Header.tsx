@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { siteConfig } from '../site.config';
 import { Menu, X } from 'lucide-react';
+import { getLenis } from '../hooks/useLenisScroll';
 
 interface HeaderProps {
   visible?: boolean;
@@ -17,6 +18,17 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleNavClick = (href: string) => {
+    setMobileMenuOpen(false);
+    if (href.startsWith('#')) {
+      const lenis = getLenis();
+      const el = document.querySelector(href);
+      if (lenis && el) {
+        lenis.scrollTo(el as HTMLElement, { offset: -72, duration: 1.15 });
+      }
+    }
+  };
 
   return (
     <header
@@ -39,70 +51,92 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
           {/* Logo XPND */}
           <a
             href="#"
-            className="flex items-center gap-2 text-xl font-extrabold tracking-[-0.03em] text-xpnd-carbon transition-colors hover:text-xpnd-taupe font-sans"
+            onClick={(e) => {
+              e.preventDefault();
+              const lenis = getLenis();
+              if (lenis) lenis.scrollTo(0, { duration: 1.15 });
+              else window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="flex items-center gap-2 text-xl font-extrabold tracking-[-0.03em] text-[#1A1817] font-sans transition-colors hover:text-[#8B746B]"
             aria-label="XPND Home"
           >
             <span className="font-sans font-extrabold text-2xl tracking-[-0.03em] text-[#1A1817]">XPND</span>
           </a>
 
-          {/* Desktop Nav Links */}
+          {/* Desktop Nav Links (com Atlason animated underline) */}
           <nav className="hidden md:flex items-center gap-8 text-[13px] font-medium text-[#1A1817]/75">
             {siteConfig.navLinks.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="transition-colors hover:text-[#1A1817] hover:font-semibold"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick(item.href);
+                }}
+                className="editorial-link transition-colors hover:text-[#1A1817] py-1"
               >
                 {item.label}
               </a>
             ))}
           </nav>
 
-          {/* Desktop CTA Pill */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Desktop CTA Pill Button */}
+          <div className="hidden md:flex items-center">
             <a
               href="#contato"
-              className="inline-flex h-9 items-center justify-center rounded-full bg-[#1A1817] px-5 text-[13px] font-semibold tracking-tight text-[#F9F8F6] transition-all duration-300 hover:bg-[#8B746B] hover:shadow-sm"
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick('#contato');
+              }}
+              className="editorial-btn-pill inline-flex h-9 items-center justify-center rounded-full bg-[#1A1817] px-4 text-xs font-semibold text-[#F9F8F6] shadow-sm hover:bg-[#8B746B]"
             >
               Agendar diagnóstico
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden flex items-center justify-center w-9 h-9 rounded-full bg-[#F3EFEA] text-[#1A1817] transition-colors"
-            aria-label="Abrir menu"
+            className="md:hidden flex h-9 w-9 items-center justify-center rounded-full bg-[#1A1817]/[0.05] text-[#1A1817]"
+            aria-label="Alternar menu de navegação"
           >
             {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
-      </div>
 
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="md:hidden mx-6 mt-2 rounded-[24px] bg-[#F9F8F6]/95 backdrop-blur-[24px] border border-[#1A1817]/[0.08] p-6 shadow-elevated animate-in fade-in slide-in-from-top-4 duration-300">
-          <nav className="flex flex-col gap-4 text-sm font-medium text-[#1A1817]">
-            {siteConfig.navLinks.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-2 border-b border-[#1A1817]/[0.05] transition-colors hover:text-xpnd-taupe"
-              >
-                {item.label}
-              </a>
-            ))}
-            <a
-              href="#contato"
-              onClick={() => setMobileMenuOpen(false)}
-              className="mt-3 flex h-11 items-center justify-center rounded-full bg-[#1A1817] px-5 text-sm font-semibold text-[#F9F8F6] transition-colors hover:bg-xpnd-taupe"
-            >
-              Agendar diagnóstico
-            </a>
-          </nav>
-        </div>
-      )}
+        {/* Mobile Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden mt-2 rounded-[24px] bg-[#F9F8F6]/95 backdrop-blur-[20px] border border-[#1A1817]/[0.08] p-6 shadow-elevated animate-in fade-in slide-in-from-top-2 duration-300">
+            <nav className="flex flex-col gap-4 text-sm font-medium text-[#1A1817]">
+              {siteConfig.navLinks.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick(item.href);
+                  }}
+                  className="py-1 transition-colors hover:text-[#8B746B]"
+                >
+                  {item.label}
+                </a>
+              ))}
+              <div className="pt-2 border-t border-[#1A1817]/[0.08]">
+                <a
+                  href="#contato"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick('#contato');
+                  }}
+                  className="editorial-btn-pill flex h-11 w-full items-center justify-center rounded-full bg-[#1A1817] text-xs font-semibold text-[#F9F8F6]"
+                >
+                  Agendar diagnóstico
+                </a>
+              </div>
+            </nav>
+          </div>
+        )}
+      </div>
     </header>
   );
 };

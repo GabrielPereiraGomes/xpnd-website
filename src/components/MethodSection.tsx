@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Compass, Cpu, GraduationCap, CheckCircle2 } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { getLenis } from '../hooks/useLenisScroll';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const MethodSection: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const stepCardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const steps = [
     {
@@ -39,8 +46,95 @@ export const MethodSection: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    const mm = gsap.matchMedia();
+
+    // 1. Masked Header Reveal (Universal)
+    const lines = sectionRef.current.querySelectorAll('.line-inner');
+    if (lines.length > 0) {
+      gsap.fromTo(
+        lines,
+        { yPercent: 110, opacity: 0.01 },
+        {
+          yPercent: 0,
+          opacity: 1,
+          duration: 0.9,
+          ease: 'power4.out',
+          stagger: 0.08,
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 86%',
+            once: true,
+          },
+        }
+      );
+    }
+
+    // 2. Desktop Mode (>= 1024px): Sticky Left + Progressive Focal Opacity on Right
+    mm.add('(min-width: 1024px)', () => {
+      stepCardRefs.current.forEach((card, idx) => {
+        if (!card) return;
+
+        ScrollTrigger.create({
+          trigger: card,
+          start: 'top center+=15%',
+          end: 'bottom center',
+          onEnter: () => setActiveStep(idx),
+          onEnterBack: () => setActiveStep(idx),
+        });
+      });
+    });
+
+    // 3. Mobile Mode (< 1024px): Fluid Vertical Stack, Smooth Individual GPU Card Reveals
+    mm.add('(max-width: 1023px)', () => {
+      stepCardRefs.current.forEach((card) => {
+        if (!card) return;
+
+        gsap.fromTo(
+          card,
+          {
+            opacity: 0,
+            y: 28,
+            scale: 1.02,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1.0,
+            duration: 0.75,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 88%',
+              once: true,
+            },
+          }
+        );
+      });
+    });
+
+    return () => mm.revert();
+  }, []);
+
+  const handleStepClick = (idx: number) => {
+    setActiveStep(idx);
+    const cardEl = stepCardRefs.current[idx];
+    if (cardEl) {
+      const lenis = getLenis();
+      if (lenis) {
+        lenis.scrollTo(cardEl, { offset: -110, duration: 1.0 });
+      } else {
+        cardEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
   return (
-    <section id="metodo" className="w-full py-28 md:py-36 px-6 bg-[#F9F8F6]">
+    <section id="metodo" ref={sectionRef} className="w-full py-28 md:py-36 px-6 bg-[#F9F8F6]">
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
@@ -50,43 +144,58 @@ export const MethodSection: React.FC = () => {
               O Método XPND
             </span>
             <h2 className="font-sans text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-[-0.03em] text-[#1A1817] leading-tight mb-6">
-              Como tiramos sua empresa do zero à operação real.
+              <span className="line-mask block">
+                <span className="line-inner block">
+                  Como tiramos sua empresa
+                </span>
+              </span>
+              <span className="line-mask block mt-1">
+                <span className="line-inner block text-[#8B746B]">
+                  do zero à operação real.
+                </span>
+              </span>
             </h2>
             <p className="text-base text-[#1A1817]/70 leading-relaxed mb-8">
               Um processo estruturado em 4 etapas lineares para implementar inteligência artificial com segurança de dados, clareza operacional e adesão genuína da sua equipe.
             </p>
 
-            {/* Step Indicators Desktop */}
+            {/* Step Indicators Desktop (Interactive scrollytelling controls) */}
             <div className="hidden lg:flex flex-col gap-3 border-l border-[#1A1817]/[0.1] pl-6">
               {steps.map((s, idx) => (
                 <button
                   key={s.num}
-                  onClick={() => setActiveStep(idx)}
-                  className={`text-left transition-all duration-300 py-1.5 flex items-center gap-3 ${
+                  onClick={() => handleStepClick(idx)}
+                  className={`text-left transition-all duration-300 py-1.5 flex items-center gap-3 editorial-btn-pill ${
                     activeStep === idx
-                      ? 'text-[#1A1817] font-bold translate-x-1'
+                      ? 'text-[#1A1817] font-bold translate-x-1.5'
                       : 'text-[#1A1817]/40 hover:text-[#1A1817]/80'
                   }`}
+                  aria-label={`Ir para a etapa ${s.num}: ${s.title}`}
                 >
-                  <span className="font-mono text-xs">{s.num}</span>
+                  <span className={`font-mono text-xs px-1.5 py-0.5 rounded ${activeStep === idx ? 'bg-[#1A1817] text-[#F9F8F6]' : ''}`}>
+                    {s.num}
+                  </span>
                   <span className="text-sm">{s.title}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Right Column: Cards Stream */}
-          <div className="lg:col-span-7 flex flex-col gap-8">
+          {/* Right Column: Cards Stream (Progressive focal opacity on desktop, fluid stack on mobile) */}
+          <div className="lg:col-span-7 flex flex-col gap-8 method-steps-container">
             {steps.map((step, idx) => {
               const Icon = step.icon;
+              const isDesktopActive = activeStep === idx;
+
               return (
                 <div
                   key={step.num}
-                  onMouseEnter={() => setActiveStep(idx)}
-                  className={`rounded-[28px] border p-8 sm:p-10 transition-all duration-500 ease-apple ${
-                    activeStep === idx
-                      ? 'bg-[#F3EFEA] border-[#1A1817]/[0.16] shadow-subtle'
-                      : 'bg-white/80 border-[#1A1817]/[0.06] hover:border-[#1A1817]/[0.12]'
+                  ref={(el) => (stepCardRefs.current[idx] = el)}
+                  onClick={() => setActiveStep(idx)}
+                  className={`gpu-layer rounded-[28px] border p-8 sm:p-10 transition-all duration-500 ease-apple cursor-pointer ${
+                    isDesktopActive
+                      ? 'bg-[#F3EFEA] border-[#1A1817]/[0.18] shadow-subtle lg:opacity-100 lg:scale-[1.01]'
+                      : 'bg-white/70 border-[#1A1817]/[0.06] hover:border-[#1A1817]/[0.12] lg:opacity-35 hover:lg:opacity-80'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-6">

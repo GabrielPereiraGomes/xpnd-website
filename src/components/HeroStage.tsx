@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { siteConfig } from '../site.config';
 import { ChevronDown } from 'lucide-react';
-import { xpndPlushRetinaUrl } from '../assets/images';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { getLenis } from '../hooks/useLenisScroll';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface HeroStageProps {
   onAnimationComplete?: () => void;
@@ -14,16 +18,19 @@ export const HeroStage: React.FC<HeroStageProps> = ({ onAnimationComplete }) => 
   const words = siteConfig.heroAnimation.rotatingWords;
   const finalSignature = siteConfig.heroAnimation.finalSignature;
 
+  const heroSectionRef = useRef<HTMLElement | null>(null);
+  const stageContentRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     // Step 1: Slide-in entrance duration
     const enterTimer = setTimeout(() => {
       setPhase('dot');
-    }, 900);
+    }, 700);
 
     // Step 2: Dot appearance
     const dotTimer = setTimeout(() => {
       setPhase('spinning');
-    }, 1300);
+    }, 1100);
 
     return () => {
       clearTimeout(enterTimer);
@@ -52,9 +59,37 @@ export const HeroStage: React.FC<HeroStageProps> = ({ onAnimationComplete }) => 
     }
   }, [phase, wordIndex, words.length, onAnimationComplete]);
 
+  // Atlason Scrub Transition on Scroll: scale: 1 -> 0.96, opacity: 1 -> 0.25, yPercent: 0 -> -8
+  useEffect(() => {
+    if (!heroSectionRef.current || !stageContentRef.current) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      gsap.to(stageContentRef.current, {
+        scale: 0.96,
+        opacity: 0.25,
+        yPercent: -8,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: heroSectionRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+        },
+      });
+    }, heroSectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   const scrollToContent = () => {
+    const lenis = getLenis();
     const el = document.getElementById('promessa');
-    if (el) {
+    if (lenis && el) {
+      lenis.scrollTo(el, { offset: -60, duration: 1.15 });
+    } else if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   };
@@ -62,42 +97,39 @@ export const HeroStage: React.FC<HeroStageProps> = ({ onAnimationComplete }) => 
   return (
     <section
       id="hero"
+      ref={heroSectionRef}
       className="relative flex h-[100svh] w-full flex-col items-center justify-center overflow-hidden bg-[#F9F8F6] px-4 select-none"
     >
       {/* Background radial gradient subtle highlight */}
       <div
         className="pointer-events-none absolute inset-0 -z-10"
         style={{
-          background: 'radial-gradient(ellipse 60% 50% at 50% 48%, rgba(212, 192, 172, 0.22) 0%, rgba(249, 248, 246, 0) 75%)',
+          background: 'radial-gradient(ellipse 65% 55% at 50% 48%, rgba(212, 192, 172, 0.22) 0%, rgba(249, 248, 246, 0) 75%)',
         }}
       />
 
-      {/* Main Lockup Stage */}
-      <div className="flex flex-col items-center justify-center">
-        {/* Animated Horizontal Lockup: [3D Plush XPND] + [.] + [Vertical Word Slot] */}
-        <div className="flex items-center justify-center flex-wrap gap-x-2 sm:gap-x-3.5 md:gap-x-4 max-w-full px-2">
+      {/* Main Lockup Stage (Pushed back via GSAP scrub on scroll) */}
+      <div ref={stageContentRef} className="flex flex-col items-center justify-center gpu-layer">
+        
+        {/* Animated Horizontal Lockup: [XPND] + [.] + [Vertical Word Slot] (Strict single-line lockup) */}
+        <div className="flex items-center justify-center flex-nowrap gap-x-1.5 sm:gap-x-3 md:gap-x-4 max-w-full px-2">
           
-          {/* 1. XPND 3D Plush Lettermark with Organic Breathing */}
+          {/* 1. XPND Canonical Pure Flat Wordmark (Carbon Ink #1A1817) */}
           <div
-            className={`flex items-center transition-all duration-1000 ease-apple ${
+            className={`flex items-center shrink-0 transition-all duration-700 ease-apple ${
               phase === 'enter'
-                ? 'opacity-0 -translate-x-14 scale-95'
+                ? 'opacity-0 -translate-x-6 scale-95'
                 : 'opacity-100 translate-x-0 scale-100'
             }`}
           >
-            <div className="relative inline-block plush-breathing">
-              <img
-                src={xpndPlushRetinaUrl}
-                alt="XPND 3D Micro-Plush Oficial"
-                className="h-10 sm:h-14 md:h-20 lg:h-24 w-auto object-contain drop-shadow-[0_8px_16px_rgba(94,75,67,0.12)] transition-transform duration-500"
-                loading="eager"
-              />
-            </div>
+            <span className="font-sans font-extrabold text-[clamp(1.65rem,6.2vw,5.5rem)] tracking-[-0.03em] text-[#1A1817] leading-none">
+              XPND
+            </span>
           </div>
 
-          {/* 2. Fixed Dot in Deep Taupe (#8B746B) */}
+          {/* 2. Fixed Dot in Signature Deep Taupe (#8B746B) */}
           <div
-            className={`transition-all duration-500 ease-apple text-[clamp(1.75rem,5vw,4.5rem)] font-extrabold leading-none text-[#8B746B] ${
+            className={`shrink-0 transition-all duration-500 ease-apple text-[clamp(1.65rem,6.2vw,5.5rem)] font-extrabold leading-none text-[#8B746B] ${
               phase === 'enter' ? 'opacity-0 scale-50' : 'opacity-100 scale-100'
             }`}
           >
@@ -106,7 +138,7 @@ export const HeroStage: React.FC<HeroStageProps> = ({ onAnimationComplete }) => 
 
           {/* 3. Vertical Slot with Smooth Masked Overflow */}
           <div
-            className={`relative flex items-center transition-all duration-700 ease-apple ${
+            className={`relative flex items-center shrink-0 transition-all duration-700 ease-apple ${
               phase === 'locked' ? 'overflow-visible h-auto py-1' : 'overflow-hidden h-[1.35em]'
             } ${
               phase === 'enter' || phase === 'dot' ? 'opacity-0 translate-y-3' : 'opacity-100 translate-y-0'
@@ -121,15 +153,15 @@ export const HeroStage: React.FC<HeroStageProps> = ({ onAnimationComplete }) => 
             }
           >
             {phase === 'locked' ? (
-              // Final Locked Word: COMPANY in Carbon Ink (#1A1817)
-              <span className="font-sans font-extrabold text-[clamp(1.6rem,4.8vw,4.25rem)] tracking-[-0.03em] text-[#1A1817] leading-none animate-in fade-in slide-in-from-top-6 duration-700 ease-apple">
+              // Final Locked Signature Word: COMPANY in Carbon Ink (#1A1817)
+              <span className="font-sans font-extrabold text-[clamp(1.65rem,6.2vw,5.5rem)] tracking-[-0.03em] text-[#1A1817] leading-none animate-in fade-in slide-in-from-top-4 duration-700 ease-apple">
                 {finalSignature}
               </span>
             ) : (
-              // Rotating Temporary Words: IA -> IMPLEMENTAÇÃO -> etc.
+              // Rotating Temporary Words: IA -> IMPLEMENTAÇÃO -> PROCESSOS -> AUTONOMIA
               <div
                 key={wordIndex}
-                className="font-sans font-extrabold text-[clamp(1.4rem,4.4vw,3.8rem)] tracking-[-0.03em] text-[#8B746B] leading-none animate-in fade-in slide-in-from-top-4 duration-300 ease-apple"
+                className="font-sans font-extrabold text-[clamp(1.35rem,5.2vw,4.6rem)] tracking-[-0.03em] text-[#8B746B] leading-none animate-in fade-in slide-in-from-top-3 duration-300 ease-apple"
               >
                 {words[wordIndex]}
               </div>

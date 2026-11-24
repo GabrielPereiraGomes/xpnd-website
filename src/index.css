@@ -1,41 +1,116 @@
+@import 'lenis/dist/lenis.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   html {
-    scroll-behavior: smooth;
     background-color: #F9F8F6;
+    touch-action: pan-y;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
+  
   body {
     background-color: #F9F8F6;
     color: #1A1817;
+    touch-action: pan-y;
     overflow-x: hidden;
+    max-width: 100vw;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Prevent horizontal scroll on all elements across all viewports */
+  *, ::before, ::after {
+    max-width: 100%;
+    box-sizing: border-box;
   }
 }
 
-/* Apple Easing Curves */
+/* Apple & Atlason Smooth Easing Curves */
 .ease-apple {
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Organic Plush Breathing Animation (Micro-Movement) */
-.plush-breathing {
-  filter: url(#xpnd-fluffy-displace);
-  transform: translateZ(0);
-  will-change: transform, filter;
-  animation: plush-breathe 4s ease-in-out infinite alternate;
+/* Masked Line Reveal Helpers (Atlason Style) */
+.line-mask {
+  overflow: hidden;
+  display: block;
 }
 
-@keyframes plush-breathe {
-  0% {
-    transform: scale(1) translateY(0);
+.line-mask-inline {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.line-inner {
+  display: block;
+  will-change: transform, opacity;
+}
+
+/* GPU Composited Performance Layers (Only transform & opacity) */
+.gpu-layer {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+/* Micro-interações de Hover (Estritamente em dispositivos com suporte a hover real) */
+@media (hover: hover) and (pointer: fine) {
+  /* Underline animado da esquerda para a direita (0.35s cubic-bezier) */
+  .editorial-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
   }
-  50% {
-    transform: scale(1.008) translateY(-1px);
+
+  .editorial-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  100% {
-    transform: scale(0.996) translateY(0.5px);
+
+  .editorial-link:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* Botões Pill com micro-interação tátil e elevação suave */
+  .editorial-btn-pill {
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .editorial-btn-pill:hover {
+    transform: scale(1.02);
+  }
+
+  .editorial-btn-pill:active {
+    transform: scale(0.985);
+  }
+
+  /* Card Elevate suave com GPU */
+  .editorial-card-hover {
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .editorial-card-hover:hover {
+    transform: translateY(-3px) scale(1.004);
   }
 }
 
@@ -47,8 +122,8 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .plush-breathing {
-    filter: none !important;
-    animation: none !important;
+
+  .editorial-link::after {
+    display: none !important;
   }
 }

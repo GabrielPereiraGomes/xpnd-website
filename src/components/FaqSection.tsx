@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const FaqSection: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const sectionRef = useRef<HTMLElement | null>(null);
 
   const faqs = [
     {
@@ -23,19 +28,58 @@ export const FaqSection: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      const lines = sectionRef.current?.querySelectorAll('.line-inner');
+      if (lines && lines.length > 0) {
+        gsap.fromTo(
+          lines,
+          { yPercent: 110, opacity: 0.01 },
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: 'power4.out',
+            stagger: 0.08,
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 86%',
+              once: true,
+            },
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   const toggle = (idx: number) => {
     setOpenIndex(openIndex === idx ? null : idx);
   };
 
   return (
-    <section id="faq" className="w-full py-28 md:py-36 px-6 bg-[#F9F8F6]">
+    <section id="faq" ref={sectionRef} className="w-full py-28 md:py-36 px-6 bg-[#F9F8F6]">
       <div className="mx-auto max-w-4xl">
         <div className="text-center mb-16">
           <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#8B746B] block mb-3">
             Perguntas Frequentes
           </span>
           <h2 className="font-sans text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-[-0.03em] text-[#1A1817] leading-tight">
-            Tudo o que você precisa saber antes de dar o próximo passo.
+            <span className="line-mask block">
+              <span className="line-inner block">
+                Tudo o que você precisa saber
+              </span>
+            </span>
+            <span className="line-mask block mt-1">
+              <span className="line-inner block text-[#8B746B]">
+                antes de dar o próximo passo.
+              </span>
+            </span>
           </h2>
         </div>
 
@@ -62,7 +106,7 @@ export const FaqSection: React.FC = () => {
                 </button>
 
                 {isOpen && (
-                  <div className="pt-4 pr-10 text-sm sm:text-base leading-relaxed text-[#1A1817]/70 animate-in fade-in duration-300">
+                  <div className="mt-4 pr-12 text-sm sm:text-base leading-relaxed text-[#1A1817]/75 animate-in fade-in slide-in-from-top-2 duration-300">
                     {faq.a}
                   </div>
                 )}

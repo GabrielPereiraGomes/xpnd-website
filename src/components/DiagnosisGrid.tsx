@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Layers, Clock, Lock } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const DiagnosisGrid: React.FC = () => {
+  const sectionRef = useRef<HTMLElement | null>(null);
+
   const painPoints = [
     {
       num: '01',
@@ -23,8 +29,65 @@ export const DiagnosisGrid: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      // 1. Masked title reveal
+      const lines = sectionRef.current?.querySelectorAll('.line-inner');
+      if (lines && lines.length > 0) {
+        gsap.fromTo(
+          lines,
+          { yPercent: 110, opacity: 0.01 },
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: 'power4.out',
+            stagger: 0.08,
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 86%',
+              once: true,
+            },
+          }
+        );
+      }
+
+      // 2. Bento Grid Cards: GPU-only composite transition scale: 1.03 -> 1.0, opacity: 0 -> 1
+      const cards = sectionRef.current?.querySelectorAll('.bento-card');
+      if (cards && cards.length > 0) {
+        gsap.fromTo(
+          cards,
+          {
+            opacity: 0,
+            scale: 1.03,
+            y: 24,
+          },
+          {
+            opacity: 1,
+            scale: 1.0,
+            y: 0,
+            duration: 0.85,
+            ease: 'power3.out',
+            stagger: 0.12,
+            scrollTrigger: {
+              trigger: sectionRef.current?.querySelector('.bento-grid'),
+              start: 'top 88%',
+              once: true,
+            },
+          }
+        );
+      }
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="diagnostico" className="w-full py-24 md:py-32 px-6 bg-[#F3EFEA]">
+    <section id="diagnostico" ref={sectionRef} className="w-full py-24 md:py-32 px-6 bg-[#F3EFEA]">
       <div className="mx-auto max-w-6xl">
         {/* Section Header */}
         <div className="max-w-2xl mb-16">
@@ -32,18 +95,27 @@ export const DiagnosisGrid: React.FC = () => {
             O Diagnóstico
           </span>
           <h2 className="font-sans text-2xl sm:text-4xl font-extrabold tracking-[-0.03em] text-[#1A1817] leading-tight">
-            O problema não é a falta de tecnologia. É a falta de método.
+            <span className="line-mask block">
+              <span className="line-inner block">
+                O problema não é a falta de tecnologia.
+              </span>
+            </span>
+            <span className="line-mask block mt-1">
+              <span className="line-inner block text-[#8B746B]">
+                É a falta de método.
+              </span>
+            </span>
           </h2>
         </div>
 
         {/* Bento Grid Editorial Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        <div className="bento-grid grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {painPoints.map((item) => {
             const Icon = item.icon;
             return (
               <div
                 key={item.num}
-                className="group relative flex flex-col justify-between rounded-[26px] bg-[#F9F8F6] p-8 sm:p-10 border border-[#1A1817]/[0.08] transition-all duration-500 ease-apple hover:-translate-y-1 hover:border-[#1A1817]/[0.18]"
+                className="bento-card editorial-card-hover gpu-layer relative flex flex-col justify-between rounded-[26px] bg-[#F9F8F6] p-8 sm:p-10 border border-[#1A1817]/[0.08]"
               >
                 <div>
                   <div className="flex items-center justify-between mb-8">
