@@ -1,134 +1,213 @@
-import React, { useEffect, useRef } from 'react';
-import { Shield, KeyRound, HardDrive, FileCheck } from 'lucide-react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import React, { useState } from 'react';
+import { Shield, KeyRound, HardDrive, FileCheck, ShieldAlert, CheckCircle2 } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
+type SecurityMode = 'xpnd' | 'public';
+
+const COMPARISON: Record<
+  SecurityMode,
+  {
+    label: string;
+    badge: string;
+    summary: string;
+    rows: { area: string; status: string; detail: string }[];
+  }
+> = {
+  xpnd: {
+    label: 'Arquitetura Privada XPND',
+    badge: 'Governança Ativa',
+    summary:
+      'Seus contratos, estratégias comerciais e base de clientes permanecem isolados em ambiente privado, com controle de acesso e cópias locais.',
+    rows: [
+      {
+        area: 'Treino de modelos externos',
+        status: 'Bloqueado (0%)',
+        detail: 'Seus prompts e documentos nunca alimentam modelos públicos.',
+      },
+      {
+        area: 'Histórico & Memória',
+        status: 'Isolado + Backup',
+        detail: 'Snapshots locais mantidos sob custódia da sua empresa.',
+      },
+      {
+        area: 'Acesso da Equipe',
+        status: 'Segmentado LGPD',
+        detail: 'Sócios e colaboradores acessam apenas o necessário por função.',
+      },
+    ],
+  },
+  public: {
+    label: 'Uso Comum Sem Método',
+    badge: 'Risco Operacional',
+    summary:
+      'Contas pessoais dispersas onde colaboradores colam contratos e planilhas financeiras sem políticas de retenção ou controle corporativo.',
+    rows: [
+      {
+        area: 'Treino de modelos externos',
+        status: 'Exposto por padrão',
+        detail: 'Dados estratégicos podem entrar em ciclos de retenção de terceiros.',
+      },
+      {
+        area: 'Histórico & Memória',
+        status: 'Fragmentado',
+        detail: 'Informação se perde em contas individuais quando alguém sai.',
+      },
+      {
+        area: 'Acesso da Equipe',
+        status: 'Sem governança',
+        detail: 'Nenhum registro claro do que foi enviado ou quem acessou.',
+      },
+    ],
+  },
+};
+
+const PILLARS = [
+  {
+    title: 'Memória Própria e Isolada',
+    desc: 'Dados do negócio, contratos e clientes nunca são usados para treinar modelos abertos de terceiros.',
+    icon: KeyRound,
+  },
+  {
+    title: 'Backups Locais e LGPD',
+    desc: 'Rotinas estruturadas para manter históricos sob controle exclusivo da empresa em conformidade legal.',
+    icon: HardDrive,
+  },
+  {
+    title: 'Validado para Setores Sensíveis',
+    desc: 'Estrutura pensada para Advocacia, Imobiliárias, Construtoras e Prestadores B2B que exigem sigilo.',
+    icon: FileCheck,
+  },
+];
 
 export const SecuritySection: React.FC = () => {
-  const sectionRef = useRef<HTMLElement | null>(null);
-
-  const securityPillars = [
-    {
-      title: 'Memória Própria e Isolada',
-      desc: 'Os dados do seu negócio, estratégias, contratos e dados de clientes nunca são utilizados para treinar modelos abertos ou públicos de terceiros.',
-      icon: KeyRound,
-    },
-    {
-      title: 'Backups Locais e Governança',
-      desc: 'Rotinas estruturadas para manter cópias e históricos no controle exclusivo da sua empresa, garantindo conformidade com a LGPD e governança corporativa.',
-      icon: HardDrive,
-    },
-    {
-      title: 'Adequado a Setores Sensíveis',
-      desc: 'Arquitetura validada para Escritórios de Advocacia, Imobiliárias, Construtoras e Prestadores B2B que lidam diariamente com informações confidenciais.',
-      icon: FileCheck,
-    },
-  ];
-
-  useEffect(() => {
-    if (!sectionRef.current) return;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
-
-    const ctx = gsap.context(() => {
-      // 1. Masked title reveal
-      const lines = sectionRef.current?.querySelectorAll('.line-inner');
-      if (lines && lines.length > 0) {
-        gsap.fromTo(
-          lines,
-          { yPercent: 110, opacity: 0.01 },
-          {
-            yPercent: 0,
-            opacity: 1,
-            duration: 0.9,
-            ease: 'power4.out',
-            stagger: 0.08,
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: 'top 86%',
-              once: true,
-            },
-          }
-        );
-      }
-
-      // 2. Pillars GPU composite animation
-      const pillars = sectionRef.current?.querySelectorAll('.security-pillar');
-      if (pillars && pillars.length > 0) {
-        gsap.fromTo(
-          pillars,
-          {
-            opacity: 0,
-            y: 20,
-            scale: 1.02,
-          },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1.0,
-            duration: 0.8,
-            ease: 'power3.out',
-            stagger: 0.12,
-            scrollTrigger: {
-              trigger: sectionRef.current?.querySelector('.security-pillars-grid'),
-              start: 'top 88%',
-              once: true,
-            },
-          }
-        );
-      }
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
+  const [mode, setMode] = useState<SecurityMode>('xpnd');
+  const active = COMPARISON[mode];
 
   return (
-    <section id="seguranca" ref={sectionRef} className="w-full py-28 md:py-36 px-6 bg-[#F9F8F6]">
+    <section id="seguranca" className="w-full py-24 md:py-32 px-4 sm:px-6 bg-[#F3EFEA]">
       <div className="mx-auto max-w-6xl">
-        <div className="gpu-layer rounded-[32px] bg-[#1A1817] text-[#F9F8F6] p-8 sm:p-14 md:p-16 relative overflow-hidden shadow-elevated">
-          {/* Subtle warm glow background inside dark container */}
+        <div className="xpnd-window rounded-[32px] text-[#F9F8F6] p-6 sm:p-12 md:p-14 relative overflow-hidden">
           <div
-            className="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full opacity-15 blur-3xl"
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full opacity-15 blur-3xl"
             style={{ background: '#D4C0AC' }}
           />
 
-          <div className="relative z-10 max-w-3xl mb-14">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold text-[#D4C0AC] uppercase tracking-wider mb-6">
-              <Shield size={14} className="text-[#D4C0AC]" />
-              Segurança, Sigilo & LGPD
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start mb-12">
+            {/* Left Copy */}
+            <div className="lg:col-span-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3.5 py-1.5 text-[11px] font-mono font-semibold text-[#D4C0AC] uppercase tracking-wider mb-5">
+                <Shield size={13} className="text-[#D4C0AC]" />
+                <span>Segurança, Sigilo &amp; LGPD</span>
+              </div>
+
+              <h2 className="font-sans text-2xl sm:text-4xl font-extrabold tracking-[-0.03em] leading-tight text-white mb-4">
+                Seus dados estratégicos sob{' '}
+                <span className="text-[#D4C0AC]">controle absoluto.</span>
+              </h2>
+
+              <p className="text-sm sm:text-base text-white/75 leading-relaxed mb-7">
+                Empresas consolidadas não podem arriscar segredos comerciais ou prontuários de clientes. Compare como a estrutura privada XPND protege sua operação frente ao uso improvisado de IA:
+              </p>
+
+              {/* Architecture Mode Switch */}
+              <div
+                role="tablist"
+                aria-label="Comparativo de arquitetura de segurança"
+                className="inline-flex flex-wrap rounded-2xl sm:rounded-full bg-white/[0.06] p-1 border border-white/10"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === 'xpnd'}
+                  onClick={() => setMode('xpnd')}
+                  className={`rounded-full px-4 py-2 text-xs font-semibold transition-all duration-300 ${
+                    mode === 'xpnd'
+                      ? 'bg-[#F9F8F6] text-[#1A1817] shadow-sm'
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  Arquitetura XPND
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === 'public'}
+                  onClick={() => setMode('public')}
+                  className={`rounded-full px-4 py-2 text-xs font-semibold transition-all duration-300 ${
+                    mode === 'public'
+                      ? 'bg-[#D4C0AC] text-[#1A1817] shadow-sm'
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  IA Pública Comum
+                </button>
+              </div>
             </div>
-            <h2 className="font-sans text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-[-0.03em] leading-tight text-white mb-6">
-              <span className="line-mask block">
-                <span className="line-inner block">
-                  Seus dados estratégicos sob seu
+
+            {/* Right Interactive Audit Card */}
+            <div className="lg:col-span-6 xpnd-window-panel rounded-[24px] p-5 sm:p-7">
+              <div className="flex items-center justify-between gap-3 pb-4 mb-4 border-b border-white/[0.08]">
+                <span className="font-sans text-base font-bold text-white">
+                  {active.label}
                 </span>
-              </span>
-              <span className="line-mask block mt-1">
-                <span className="line-inner block text-[#D4C0AC]">
-                  controle absoluto.
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[11px] font-semibold ${
+                    mode === 'xpnd'
+                      ? 'bg-[#3F6A58]/30 text-[#9EE2C3] border border-[#3F6A58]/40'
+                      : 'bg-[#D4C0AC]/15 text-[#D4C0AC] border border-[#D4C0AC]/30'
+                  }`}
+                >
+                  {mode === 'xpnd' ? <CheckCircle2 size={12} /> : <ShieldAlert size={12} />}
+                  <span>{active.badge}</span>
                 </span>
-              </span>
-            </h2>
-            <p className="text-base sm:text-lg text-white/70 leading-relaxed">
-              Sabemos que empresas consolidadas não podem arriscar segredos de negócio ou informações confidenciais de clientes. Por isso, toda a infraestrutura implementada pela XPND prioriza privacidade, sigilo contratual e conformidade legal.
-            </p>
+              </div>
+
+              <p className="text-xs sm:text-sm text-white/70 leading-relaxed mb-5">
+                {active.summary}
+              </p>
+
+              <div className="space-y-2.5">
+                {active.rows.map((row) => (
+                  <div
+                    key={row.area}
+                    className="rounded-2xl bg-black/25 border border-white/[0.07] p-3.5"
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="text-xs font-semibold text-white">
+                        {row.area}
+                      </span>
+                      <span
+                        className={`font-mono text-[11px] font-semibold ${
+                          mode === 'xpnd' ? 'text-[#9EE2C3]' : 'text-[#D4C0AC]'
+                        }`}
+                      >
+                        {row.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-white/60 leading-snug">{row.detail}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="security-pillars-grid relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-white/10">
-            {securityPillars.map((p) => {
+          {/* 3 Compact Pillars Footer */}
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t border-white/10">
+            {PILLARS.map((p) => {
               const Icon = p.icon;
               return (
-                <div key={p.title} className="security-pillar gpu-layer flex flex-col">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-[#D4C0AC] mb-5">
-                    <Icon size={20} />
+                <div key={p.title} className="flex items-start gap-3.5">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-[#D4C0AC]">
+                    <Icon size={18} />
                   </div>
-                  <h3 className="font-sans text-lg font-bold text-white mb-2 tracking-tight">
-                    {p.title}
-                  </h3>
-                  <p className="text-sm text-white/65 leading-relaxed">
-                    {p.desc}
-                  </p>
+                  <div>
+                    <h3 className="font-sans text-sm sm:text-base font-bold text-white mb-1">
+                      {p.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-white/65 leading-relaxed">
+                      {p.desc}
+                    </p>
+                  </div>
                 </div>
               );
             })}

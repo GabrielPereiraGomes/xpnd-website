@@ -6,14 +6,56 @@
     <title>XPND — Assessoria Privada de Inteligência Artificial para Empresas</title>
     <meta name="description" content="Sua empresa não precisa de mais ferramentas. Precisa de Inteligência Artificial funcionando na rotina com segurança e sem tecniquês." />
     <meta name="theme-color" content="#F9F8F6" />
-    
+    <link rel="canonical" href="https://xpnd.company/" />
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="XPND" />
+    <meta property="og:title" content="XPND — Assessoria Privada de Inteligência Artificial para Empresas" />
+    <meta property="og:description" content="Menos ferramentas. Mais IA funcionando na rotina da sua empresa de 3 a 30 colaboradores — com dados protegidos, governança e implementação real." />
+    <meta property="og:url" content="https://xpnd.company/" />
+    <meta property="og:image" content="https://xpnd.company/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="XPND — Menos ferramentas. Mais IA funcionando na rotina." />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="XPND — Assessoria Privada de IA para Empresas" />
+    <meta name="twitter:description" content="Para empresas de 3 a 30 colaboradores. Dados protegidos, governança clara e implementação real sem tecniquês." />
+    <meta name="twitter:image" content="https://xpnd.company/og-image.png" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "XPND",
+        "url": "https://xpnd.company/",
+        "logo": "https://xpnd.company/assets/xpnd_logo_fluffy_pale_oak_v2_static.png",
+        "image": "https://xpnd.company/og-image.png",
+        "description": "Assessoria privada de Inteligência Artificial para empresas de 3 a 30 colaboradores: governança, educação executiva e implementação real.",
+        "email": "contato@xpnd.company",
+        "telephone": "+55-47-99124-7390",
+        "founder": {
+          "@type": "Person",
+          "name": "Gabriel Pereira Gomes"
+        },
+        "sameAs": [
+          "https://instagram.com/xpnd.company",
+          "https://youtube.com/@xpndcompany"
+        ]
+      }
+    </script>
+
     <!-- Favicon & Icons -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <!-- Preload Official Hero & Header Fluffy Logos (eliminates pop-in on reload) -->
+    <!-- Preload Official Hero Fluffy Logo -->
     <link rel="preload" as="image" href="/assets/xpnd_logo_fluffy_pale_oak_v2.webp" type="image/webp" fetchpriority="high" />
-    <link rel="preload" as="image" href="/assets/xpnd_logo_fluffy_pale_oak_v2_static.webp" type="image/webp" fetchpriority="high" />
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -57,18 +99,6 @@
     </style>
   </head>
   <body class="bg-xpnd-snow text-xpnd-carbon min-h-screen selection:bg-xpnd-taupe selection:text-xpnd-snow">
-    <!-- SVG Filter Defs for Organic Micro-Plush Breathing Effect -->
-    <svg class="sr-only" aria-hidden="true" width="0" height="0">
-      <defs>
-        <filter id="xpnd-fluffy-displace" x="-10%" y="-10%" width="120%" height="120%">
-          <feTurbulence id="plushTurbulence" type="fractalNoise" baseFrequency="0.045 0.045" numOctaves="2" result="noise" seed="2">
-            <animate attributeName="baseFrequency" dur="7s" values="0.042 0.046;0.048 0.042;0.042 0.046" repeatCount="indefinite" />
-          </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.8" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
-      </defs>
-    </svg>
-
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { siteConfig } from '../site.config';
 import { Menu, X } from 'lucide-react';
 import { getLenis } from '../hooks/useLenisScroll';
@@ -10,22 +10,93 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeHref, setActiveHref] = useState<string>('#sistema');
+  const [pillStyle, setPillStyle] = useState<{ left: number; width: number; opacity: number }>({
+    left: 0,
+    width: 0,
+    opacity: 0,
+  });
+
+  const navContainerRef = useRef<HTMLDivElement | null>(null);
+  const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 40);
+      setScrolled(window.scrollY > 36);
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false);
+      }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
+
+  // ScrollSpy via IntersectionObserver para pílula ativa deslizante
+  useEffect(() => {
+    const sections = siteConfig.navLinks
+      .map((item) => ({ href: item.href, el: document.querySelector(item.href) }))
+      .filter((item): item is { href: string; el: Element } => item.el !== null);
+
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        if (visibleEntries.length > 0) {
+          const id = visibleEntries[0].target.getAttribute('id');
+          if (id) setActiveHref(`#${id}`);
+        }
+      },
+      {
+        rootMargin: '-28% 0px -52% 0px',
+        threshold: [0.1, 0.35, 0.6],
+      }
+    );
+
+    sections.forEach(({ el }) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  // Atualiza posição geométrica da pílula branca deslizante
+  useEffect(() => {
+    const updatePill = () => {
+      const container = navContainerRef.current;
+      const activeEl = linkRefs.current[activeHref];
+      if (!container || !activeEl) return;
+
+      const containerRect = container.getBoundingClientRect();
+      const activeRect = activeEl.getBoundingClientRect();
+      setPillStyle({
+        left: activeRect.left - containerRect.left,
+        width: activeRect.width,
+        opacity: 1,
+      });
+    };
+
+    updatePill();
+    window.addEventListener('resize', updatePill);
+    return () => window.removeEventListener('resize', updatePill);
+  }, [activeHref]);
 
   const handleNavClick = (href: string) => {
     setMobileMenuOpen(false);
+    setActiveHref(href);
     if (href.startsWith('#')) {
       const lenis = getLenis();
       const el = document.querySelector(href);
       if (lenis && el) {
-        lenis.scrollTo(el as HTMLElement, { offset: -72, duration: 1.15 });
+        lenis.scrollTo(el as HTMLElement, { offset: -72, duration: 1.05 });
+      } else if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
       }
     }
   };
@@ -37,25 +108,25 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
       }`}
     >
       <div
-        className={`mx-auto max-w-6xl px-6 transition-all duration-500 ease-apple ${
-          scrolled ? 'pt-3 pb-3' : 'pt-4 pb-2'
+        className={`mx-auto max-w-6xl px-4 sm:px-6 transition-all duration-500 ease-apple ${
+          scrolled ? 'pt-3 pb-2' : 'pt-4 pb-2'
         }`}
       >
         <div
-          className={`flex h-14 items-center justify-between md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] rounded-full px-6 transition-all duration-500 ease-apple border ${
+          className={`flex h-14 items-center justify-between gap-4 rounded-full px-4 sm:px-5 transition-all duration-500 ease-apple border ${
             scrolled
-              ? 'bg-[#F9F8F6]/85 backdrop-blur-[18px] border-[#1A1817]/[0.08] shadow-[0_4px_24px_-4px_rgba(26,24,23,0.05)]'
-              : 'bg-transparent border-transparent'
+              ? 'bg-[#F9F8F6]/88 backdrop-blur-[18px] border-[#1A1817]/[0.09] shadow-[0_6px_28px_-6px_rgba(26,24,23,0.08)]'
+              : 'bg-[#F9F8F6]/65 backdrop-blur-[10px] border-[#1A1817]/[0.05]'
           }`}
         >
-          {/* Logo XPND Fluffy Pale Oak Estática (fiel ao padrão da Hero sem loop) */}
-          <div className="flex items-center md:justify-self-start">
+          {/* Logo XPND Fluffy Pale Oak Estática */}
+          <div className="flex items-center shrink-0">
             <a
               href="#"
               onClick={(e) => {
                 e.preventDefault();
                 const lenis = getLenis();
-                if (lenis) lenis.scrollTo(0, { duration: 1.15 });
+                if (lenis) lenis.scrollTo(0, { duration: 1.05 });
                 else window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className="inline-flex items-center transition-opacity duration-300 hover:opacity-85"
@@ -68,7 +139,7 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
                   alt="XPND"
                   width={374}
                   height={134}
-                  className="h-9 sm:h-10 w-auto object-contain -ml-[4px] select-none"
+                  className="h-8 sm:h-9 w-auto object-contain select-none"
                   loading="eager"
                   decoding="sync"
                 />
@@ -76,41 +147,69 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
             </a>
           </div>
 
-          {/* Desktop Nav Links (Estritamente centralizados no eixo da página + Atlason underline) */}
-          <nav className="hidden md:flex md:justify-self-center items-center gap-8 text-[13px] font-medium text-[#1A1817]/75">
-            {siteConfig.navLinks.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleNavClick(item.href);
+          {/* Segmented Pill Nav with Sliding Highlight */}
+          <nav
+            aria-label="Navegação principal"
+            className="hidden lg:flex items-center justify-center"
+          >
+            <div
+              ref={navContainerRef}
+              className="relative inline-flex items-center rounded-full bg-[#F3EFEA] p-1 border border-[#1A1817]/[0.07]"
+            >
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute top-1 bottom-1 rounded-full bg-white shadow-[0_2px_8px_rgba(26,24,23,0.08)] transition-all duration-300 ease-apple"
+                style={{
+                  transform: `translate3d(${pillStyle.left}px, 0, 0)`,
+                  width: `${pillStyle.width}px`,
+                  opacity: pillStyle.opacity,
                 }}
-                className="editorial-link transition-colors hover:text-[#1A1817] py-1 whitespace-nowrap"
-              >
-                {item.label}
-              </a>
-            ))}
+              />
+              {siteConfig.navLinks.map((item) => {
+                const isActive = activeHref === item.href;
+                return (
+                  <a
+                    key={item.href}
+                    ref={(el) => {
+                      linkRefs.current[item.href] = el;
+                    }}
+                    href={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavClick(item.href);
+                    }}
+                    className={`relative z-10 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap ${
+                      isActive ? 'text-[#1A1817]' : 'text-[#5C5A58] hover:text-[#1A1817]'
+                    }`}
+                  >
+                    {item.label}
+                  </a>
+                );
+              })}
+            </div>
           </nav>
 
-          {/* Right Column: Desktop CTA Pill Button & Mobile Menu Trigger */}
-          <div className="flex items-center justify-end md:justify-self-end">
+          {/* Right Action & Mobile Trigger */}
+          <div className="flex items-center gap-2 shrink-0">
             <a
               href="#contato"
               onClick={(e) => {
                 e.preventDefault();
                 handleNavClick('#contato');
               }}
-              className="hidden md:inline-flex editorial-btn-pill h-9 items-center justify-center rounded-full bg-[#1A1817] px-5 text-xs font-semibold text-[#F9F8F6] shadow-sm hover:bg-[#8B746B] whitespace-nowrap"
+              className="hidden sm:inline-flex editorial-btn-pill h-9 items-center justify-center gap-2 rounded-full bg-[#1A1817] px-4 sm:px-5 text-xs font-semibold text-[#F9F8F6] shadow-sm hover:bg-[#8B746B] whitespace-nowrap"
             >
-              Agendar diagnóstico
+              <span className="h-1.5 w-1.5 rounded-full bg-[#3F6A58]" aria-hidden="true" />
+              <span>Agendar diagnóstico</span>
             </a>
 
-            {/* Mobile Menu Hamburger */}
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden flex h-9 w-9 items-center justify-center rounded-full bg-[#1A1817]/[0.05] text-[#1A1817]"
+              className="lg:hidden flex h-9 w-9 items-center justify-center rounded-full bg-[#F3EFEA] text-[#1A1817] border border-[#1A1817]/[0.08]"
               aria-label="Alternar menu de navegação"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-nav-panel"
             >
               {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
@@ -119,8 +218,11 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-2 rounded-[24px] bg-[#F9F8F6]/95 backdrop-blur-[20px] border border-[#1A1817]/[0.08] p-6 shadow-elevated animate-in fade-in slide-in-from-top-2 duration-300">
-            <nav className="flex flex-col gap-4 text-sm font-medium text-[#1A1817]">
+          <div
+            id="mobile-nav-panel"
+            className="lg:hidden mt-2 rounded-[24px] bg-[#F9F8F6]/95 backdrop-blur-[20px] border border-[#1A1817]/[0.08] p-5 shadow-elevated animate-in fade-in slide-in-from-top-2 duration-300"
+          >
+            <nav className="flex flex-col gap-1.5 text-sm font-medium text-[#1A1817]">
               {siteConfig.navLinks.map((item) => (
                 <a
                   key={item.href}
@@ -129,21 +231,26 @@ export const Header: React.FC<HeaderProps> = ({ visible = true }) => {
                     e.preventDefault();
                     handleNavClick(item.href);
                   }}
-                  className="py-1 transition-colors hover:text-[#8B746B]"
+                  className={`rounded-xl px-3.5 py-2.5 transition-colors ${
+                    activeHref === item.href
+                      ? 'bg-[#F3EFEA] font-bold text-[#1A1817]'
+                      : 'text-[#5C5A58] hover:bg-[#F3EFEA]/60 hover:text-[#1A1817]'
+                  }`}
                 >
                   {item.label}
                 </a>
               ))}
-              <div className="pt-2 border-t border-[#1A1817]/[0.08]">
+              <div className="pt-3 mt-2 border-t border-[#1A1817]/[0.08]">
                 <a
                   href="#contato"
                   onClick={(e) => {
                     e.preventDefault();
                     handleNavClick('#contato');
                   }}
-                  className="editorial-btn-pill flex h-11 w-full items-center justify-center rounded-full bg-[#1A1817] text-xs font-semibold text-[#F9F8F6]"
+                  className="flex w-full h-11 items-center justify-center gap-2 rounded-full bg-[#1A1817] font-semibold text-sm text-[#F9F8F6]"
                 >
-                  Agendar diagnóstico
+                  <span className="h-2 w-2 rounded-full bg-[#3F6A58]" aria-hidden="true" />
+                  <span>Agendar sessão de diagnóstico</span>
                 </a>
               </div>
             </nav>

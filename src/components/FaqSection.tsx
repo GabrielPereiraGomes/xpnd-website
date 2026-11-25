@@ -24,7 +24,7 @@ export const FaqSection: React.FC = () => {
     },
     {
       q: 'Como funciona o primeiro passo e o que acontece na sessão de diagnóstico?',
-      a: 'O primeiro contato é feito de forma ágil pela Lisa (nossa assistente de IA), que colhe as informações básicas da sua empresa e agenda uma reunião de 45 minutos diretamente com o Gabriel Pereira Gomes. Nessa sessão individual, mapeamos seus principais gargalos e apresentamos uma proposta sob medida — sem pressão e com total transparência.',
+      a: 'O primeiro contato é rápido e direto pelo WhatsApp ou pelo formulário aqui no site. Alinhamos as informações iniciais da sua empresa e agendamos uma reunião de 45 minutos diretamente com o Gabriel Pereira Gomes. Nessa sessão individual, mapeamos seus principais gargalos e apresentamos uma proposta sob medida — sem pressão e com total transparência.',
     },
   ];
 
@@ -63,7 +63,7 @@ export const FaqSection: React.FC = () => {
   };
 
   return (
-    <section id="faq" ref={sectionRef} className="w-full py-28 md:py-36 px-6 bg-[#F9F8F6]">
+    <section id="faq" ref={sectionRef} className="w-full py-20 md:py-28 px-4 sm:px-6 bg-[#F9F8F6]">
       <div className="mx-auto max-w-4xl">
         <div className="text-center mb-16">
           <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#8B746B] block mb-3">
@@ -86,12 +86,17 @@ export const FaqSection: React.FC = () => {
         <div className="divide-y divide-[#1A1817]/[0.08]">
           {faqs.map((faq, idx) => {
             const isOpen = openIndex === idx;
+            const triggerId = `faq-trigger-${idx}`;
+            const panelId = `faq-panel-${idx}`;
             return (
               <div key={idx} className="py-6 sm:py-8 transition-colors">
                 <button
+                  id={triggerId}
+                  type="button"
                   onClick={() => toggle(idx)}
                   className="flex w-full items-center justify-between gap-6 text-left group"
                   aria-expanded={isOpen}
+                  aria-controls={panelId}
                 >
                   <span className="font-sans text-base sm:text-lg font-bold text-[#1A1817] group-hover:text-[#8B746B] transition-colors">
                     {faq.q}
@@ -100,13 +105,19 @@ export const FaqSection: React.FC = () => {
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F3EFEA] text-[#1A1817] transition-transform duration-300 ${
                       isOpen ? 'rotate-180 bg-[#1A1817] text-[#F9F8F6]' : ''
                     }`}
+                    aria-hidden="true"
                   >
                     <ChevronDown size={16} />
                   </div>
                 </button>
 
                 {isOpen && (
-                  <div className="mt-4 pr-12 text-sm sm:text-base leading-relaxed text-[#1A1817]/75 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div
+                    id={panelId}
+                    role="region"
+                    aria-labelledby={triggerId}
+                    className="mt-4 pr-12 text-sm sm:text-base leading-relaxed text-[#1A1817]/80 animate-in fade-in slide-in-from-top-2 duration-300"
+                  >
                     {faq.a}
                   </div>
                 )}

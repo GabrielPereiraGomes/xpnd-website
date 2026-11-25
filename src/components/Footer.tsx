@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { siteConfig } from '../site.config';
 import { Instagram, Youtube } from 'lucide-react';
+import { PrivacyModal } from './PrivacyModal';
 
 export const Footer: React.FC = () => {
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+
   return (
     <footer className="w-full bg-[#F9F8F6] border-t border-[#1A1817]/[0.06] py-16 px-6 text-[#1A1817]">
       <div className="mx-auto max-w-6xl">
@@ -22,7 +25,7 @@ export const Footer: React.FC = () => {
             </p>
           </div>
 
-          {/* Contact Emails & Socials */}
+          {/* Contact Channels & Socials */}
           <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
             <div>
               <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#8B746B] block mb-3">
@@ -30,18 +33,11 @@ export const Footer: React.FC = () => {
               </span>
               <ul className="space-y-2 text-xs">
                 <li>
-                  <a href={`mailto:${siteConfig.contacts.emailGeneral}`} className="hover:text-[#8B746B] transition-colors">
+                  <a
+                    href={`mailto:${siteConfig.contacts.emailGeneral}`}
+                    className="hover:text-[#8B746B] transition-colors"
+                  >
                     {siteConfig.contacts.emailGeneral}
-                  </a>
-                </li>
-                <li>
-                  <a href={`mailto:${siteConfig.contacts.emailFounder}`} className="hover:text-[#8B746B] transition-colors">
-                    {siteConfig.contacts.emailFounder}
-                  </a>
-                </li>
-                <li>
-                  <a href={`mailto:${siteConfig.contacts.emailLisa}`} className="hover:text-[#8B746B] transition-colors">
-                    {siteConfig.contacts.emailLisa} (Assistente IA)
                   </a>
                 </li>
               </ul>
@@ -77,16 +73,23 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Legal & Copyright */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-mono text-[#1A1817]/50">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-mono text-[#5C5A58]">
           <div>
             XPND © 2026. Todos os direitos reservados.
           </div>
           <div className="flex items-center gap-4">
-            <span>Privacidade & LGPD</span>
-            <span>•</span>
+            <button
+              type="button"
+              onClick={() => setPrivacyOpen(true)}
+              className="hover:text-[#1A1817] underline underline-offset-4 transition-colors"
+            >
+              Privacidade &amp; LGPD
+            </button>
+            <span aria-hidden="true">•</span>
             <span>{siteConfig.brand.signatureDomain}</span>
           </div>
         </div>
+        <PrivacyModal isOpen={privacyOpen} onClose={() => setPrivacyOpen(false)} />
 
       </div>
     </footer>

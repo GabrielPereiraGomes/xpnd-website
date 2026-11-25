@@ -1,7 +1,15 @@
 /**
  * XPND — Configuração Centralizada de Links, Contatos e Integrações
- * Todos os links externos, contatos da Lisa e webhooks devem ser editados aqui.
  */
+
+const WHATSAPP_NUMBER = '5547991247390';
+const WHATSAPP_DEFAULT_MESSAGE =
+  'Fala time da XPND, quero mais informações sobre a consultoria em IA';
+
+export const buildWhatsAppUrl = (customMessage?: string) =>
+  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    customMessage || WHATSAPP_DEFAULT_MESSAGE
+  )}`;
 
 export const siteConfig = {
   brand: {
@@ -16,36 +24,26 @@ export const siteConfig = {
   // Contatos Oficiais
   contacts: {
     emailGeneral: 'contato@xpnd.company',
-    emailFounder: 'gabriel@xpnd.company',
-    emailLisa: 'lisa@xpnd.company',
+    whatsappNumber: WHATSAPP_NUMBER,
+    whatsappDisplay: '(47) 99124-7390',
+    whatsappDefaultMessage: WHATSAPP_DEFAULT_MESSAGE,
+    whatsappUrl: buildWhatsAppUrl(),
   },
 
-  // Assistente Lisa (Triagem, WhatsApp e Agenda)
-  lisa: {
-    name: 'Lisa',
-    title: 'Assistente de IA do Gabriel na XPND',
-    description: 'Atua na triagem inicial, qualificação do seu perfil e agendamento direto com o Gabriel.',
-    email: 'lisa@xpnd.company',
-    // Link direto para WhatsApp com mensagem pré-formatada de diagnóstico
-    whatsappUrl: 'https://wa.me/5547999999999?text=Ol%C3%A1%2C%20Lisa!%20Gostaria%20de%20entender%20como%20a%20XPND%20pode%20implantar%20Intelig%C3%AAncia%20Artificial%20na%20rotina%20da%20minha%20empresa.',
-    // Link de agendamento de call (Cal.com / Google Calendar)
-    bookingUrl: 'https://cal.com/xpnd/diagnostico',
-  },
-
-  // Redes Sociais Ativas (Dia 1: Apenas Instagram e YouTube)
+  // Redes Sociais Ativas
   social: {
     instagram: 'https://instagram.com/xpnd.company',
     youtube: 'https://youtube.com/@xpndcompany',
   },
 
-  // Integração Comercial com RD Station CRM (Webhook / Endpoint)
+  // Integração Comercial (Webhook / Endpoint opcional)
   rdStation: {
     conversionIdentifier: 'diagnostico-xpnd-site',
-    webhookUrl: '', // Preencha com o Webhook do RD Station quando ativo
-    fallbackMailto: 'lisa@xpnd.company',
+    webhookUrl: '',
+    fallbackMailto: 'contato@xpnd.company',
   },
 
-  // Sequência de Palavras da Rotação da Abertura (v3 — 7 Etapas Ágeis)
+  // Sequência de Palavras da Rotação da Abertura
   heroAnimation: {
     words: [
       'AI',
@@ -57,16 +55,17 @@ export const siteConfig = {
       'Company',
     ],
     finalSignature: 'Company',
-    initialDelay: 0.25,
-    durationPerWord: 0.38,
-    pauseBetweenWords: 0.26,
+    initialDelay: 0.15,
+    durationPerWord: 0.28,
+    pauseBetweenWords: 0.16,
   },
 
-  // Navegação Principal do Header
+  // Navegação Principal do Header (ordem narrativa da página)
   navLinks: [
-    { label: 'O Método', href: '#metodo' },
-    { label: 'Formatos', href: '#formatos' },
+    { label: 'Sistema', href: '#sistema' },
+    { label: 'Método', href: '#metodo' },
     { label: 'Segurança', href: '#seguranca' },
+    { label: 'Formatos', href: '#formatos' },
     { label: 'Sobre', href: '#sobre' },
   ],
 };
